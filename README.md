@@ -50,35 +50,25 @@ pnpm preview         # 預覽正式版本
 - **鍵盤**：Tab 巡覽；按鈕以 Enter／空白鍵操作；聚焦模型後用左右方向鍵控制層次、Esc 闔上、＋／－縮放。
 - **無 WebGL**：3D 顯示需要 WebGL 2；不支援時仍能閱讀全部器官與文獻。
 
-## 放到 GitHub Pages
+## GitHub Pages 與自訂網域
 
-本專案是純靜態網站，沒有後端、金鑰或伺服器資料庫。GitHub Actions 設定已放在 `.github/workflows/deploy.yml`。
+儲存庫：[boson-1/cockroach-3d](https://github.com/boson-1/cockroach-3d)。網站網域：[maxxc.jamesboson.com](https://maxxc.jamesboson.com/)。
 
-1. 在 GitHub 建立一個空儲存庫，先不要勾選自動加入 README。
-2. 這份專案已初始化為 `main`，原始碼已暫存。若尚未有第一次提交，先以自己的姓名與 email 設定**這個儲存庫**的作者，再提交（不修改全域設定）：
+本專案是純靜態網站，沒有後端、金鑰或伺服器資料庫。推送 `main` 時，`.github/workflows/deploy.yml` 會安裝固定版本依賴、執行單元與瀏覽器測試、建置六個 HTML 頁面，再將 `dist/` 部署至 GitHub Pages。也可從 [Actions](https://github.com/boson-1/cockroach-3d/actions/workflows/deploy.yml) 手動執行。
 
-   ```sh
-   git config user.name "YOUR_NAME"
-   git config user.email "YOUR_EMAIL"
-   git commit -m "Build interactive cockroach anatomy atlas"
-   ```
+GitHub 的 **Settings → Pages** 使用 **GitHub Actions**，Custom domain 設為 `maxxc.jamesboson.com`。自訂工作流程的網域設定由 GitHub Pages 設定／API 管理，`CNAME` 檔案不是設定來源。
 
-   原始美洲蟑螂版本已先建立本地提交，新增物種在其後套用。已有提交的版本可略過這一步。
+Squarespace Domains 的 **jamesboson.com → DNS → DNS Settings → Custom Records** 對應以下記錄：
 
-3. 將本機儲存庫連到你的 GitHub 儲存庫，推送 `main`：
+| Type | Name / Host | Data / Alias | TTL |
+| --- | --- | --- | --- |
+| CNAME | `maxxc` | `boson-1.github.io` | 預設值 |
 
-   ```sh
-   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
-   git push -u origin main
-   ```
+DNS 目標不含 `https://`、路徑或 repo 名稱。DNS 生效後，GitHub 會為自訂網域申請憑證；憑證可用時啟用 **Enforce HTTPS**。網站可用狀態以 [Pages 設定](https://github.com/boson-1/cockroach-3d/settings/pages) 與實際 HTTPS 回應為準。
 
-4. 在 GitHub 的 **Settings → Pages → Build and deployment → Source** 選擇 **GitHub Actions**。
-5. 若第一次推送早於 Pages 設定完成，在 **Actions → Deploy to GitHub Pages → Run workflow** 手動重跑即可。
-6. 成功後網址會出現在 Pages 設定與 Actions 的部署結果中。之後推送 `main` 會自動重新測試、建置與部署。
+`vite.config.js` 使用相對路徑 `base: './'`，可同時支援網域根目錄與 GitHub Pages 專案子路徑。瀏覽器測試實際從 `/cockroach-atlas/` 載入正式建置。工作流程只上傳 `dist/`；測試截圖、參考掃描頁、PAT 及開發暫存副本都不在部署產物中。
 
-`vite.config.js` 使用相對路徑 `base: './'`，因此可部署在根目錄或 `/YOUR_REPOSITORY/`，不必修改儲存庫名稱。瀏覽器測試實際從 `/cockroach-atlas/` 載入正式建置，檢查資源路徑。工作流程只上傳 `dist/`，不會公開測試截圖、參考照片或開發資料。
-
-設定方式參考 [GitHub Pages 自訂工作流程](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) 與 [Vite 靜態部署指南](https://vite.dev/guide/static-deploy.html)。本機版本尚未建立 GitHub 遠端或公開部署。
+設定依據：[GitHub Pages 自訂工作流程](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)、[GitHub 自訂子網域](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-a-subdomain)、[Squarespace DNS 記錄](https://support.squarespace.com/hc/en-us/articles/31119879125645-DNS-records-for-web-hosting)。
 
 ## 瀏覽器整合測試
 
