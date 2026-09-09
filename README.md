@@ -70,6 +70,14 @@ DNS 目標不含 `https://`、路徑或 repo 名稱。DNS 生效後，GitHub 會
 
 設定依據：[GitHub Pages 自訂工作流程](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)、[GitHub 自訂子網域](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-a-subdomain)、[Squarespace DNS 記錄](https://support.squarespace.com/hc/en-us/articles/31119879125645-DNS-records-for-web-hosting)。
 
+## Google Search Console
+
+本站使用已驗證的 [HTTPS 網址資源](https://search.google.com/search-console?resource_id=https%3A%2F%2Fmaxxc.jamesboson.com%2F)，透過既有的網域名稱供應商驗證自動確認擁有權；請保留原有 Google 網域驗證 DNS 紀錄。
+
+`public/sitemap.xml` 列出六個物種的正式 HTTPS 網址，`public/robots.txt` 提供 Sitemap 位置。六個 HTML 頁面各有 canonical 標記，美洲頁面的標準網址為根目錄 `/`。新增或更改物種路徑時，同步維護 Sitemap 與 canonical；`public/` 的檔案由 Vite 複製至正式網站根目錄。
+
+在 Search Console 的 **Sitemap** 報表提交 `https://maxxc.jamesboson.com/sitemap.xml`。Sitemap 是網址探索提示，實際檢索與索引狀態以 Google 報表為準。
+
 ## 瀏覽器整合測試
 
 測試直接服務 `dist/`，不需要先啟動開發伺服器。Windows 使用已安裝的 Microsoft Edge；macOS／Linux 先安裝 Playwright Chromium：
