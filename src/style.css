@@ -2027,3 +2027,445 @@ dialog::backdrop {
 #hover-cue[hidden] {
   display: none;
 }
+
+/* Species collection: accessible links are separate shareable static pages. */
+.species-title-break {
+  display: none;
+}
+.species-nav {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  border: 1px solid #d6ccba;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0 0 15px;
+  background: #eee8da;
+}
+.species-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  padding: 17px 16px;
+  text-decoration: none;
+  color: #645c4f;
+  border-right: 1px solid #d6ccba;
+  transition: background 0.2s;
+}
+.species-link:last-child {
+  border: 0;
+}
+.species-link.current {
+  background: #fffaf0;
+  color: #33281e;
+  box-shadow: inset 0 -3px #966641;
+}
+.species-link:hover {
+  background: #f9f4e9;
+}
+.species-link strong {
+  font-size: 14px;
+  display: block;
+  font-weight: 600;
+}
+.species-link small {
+  display: block;
+  font:
+    11px ui-monospace,
+    monospace;
+  margin-top: 5px;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+.species-number {
+  margin-left: auto;
+  font:
+    10px ui-monospace,
+    monospace;
+  opacity: 0.5;
+}
+.species-swatch {
+  flex: none;
+  width: 20px;
+  height: 33px;
+  display: block;
+  border-radius: 48% 48% 40% 40%;
+  border: 1px solid #6b4327;
+  background: linear-gradient(
+    90deg,
+    #52251b,
+    #985b32 45%,
+    #52251b 50%,
+    #82462c
+  );
+  box-shadow: inset 0 3px 0 1px #c5a15f;
+}
+.species-swatch.australian {
+  background:
+    linear-gradient(#d6b264, #d6b264) left 2px top 8px / 2px 9px no-repeat,
+    linear-gradient(#d6b264, #d6b264) right 2px top 8px / 2px 9px no-repeat,
+    #512b1e;
+  box-shadow: inset 0 3px 0 #c9a047;
+}
+.species-swatch.german {
+  background: linear-gradient(
+    90deg,
+    #b08e53 18%,
+    #463425 20% 31%,
+    #c5a768 33% 63%,
+    #463425 65% 76%,
+    #b08e53 78%
+  );
+  box-shadow: none;
+}
+.species-swatch.brown {
+  background: linear-gradient(90deg, #64442b, #956a47, #68412b);
+  box-shadow: inset 0 3px 0 #a78151;
+}
+.species-swatch.banded {
+  background: linear-gradient(
+    #493525 0 19%,
+    #b59d66 20% 30%,
+    #755031 31% 46%,
+    #d3bc7e 47% 57%,
+    #694a2b 58%
+  );
+  box-shadow: none;
+}
+.species-swatch.harlequin {
+  background:
+    radial-gradient(ellipse at 25% 23%, #dec58e 0 14%, transparent 16%),
+    radial-gradient(ellipse at 80% 53%, #ccbc90 0 23%, transparent 25%),
+    radial-gradient(ellipse at 23% 83%, #c5ad73 0 20%, transparent 22%), #302a20;
+  box-shadow: none;
+}
+.species-context {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin: 0 0 23px;
+  color: #6e6455;
+  font-size: 12px;
+}
+.species-context > span:first-child {
+  flex: none;
+  font:
+    11px ui-monospace,
+    monospace;
+  letter-spacing: 1px;
+}
+.species-context p {
+  margin: 0;
+  flex: 1;
+  line-height: 1.8;
+}
+.size-chip {
+  border-left: 1px solid #cabea8;
+  padding-left: 17px;
+  white-space: nowrap;
+}
+.species-evidence {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 1.9;
+  color: #796e5f;
+  margin: 12px 2px;
+}
+.species-evidence svg {
+  flex: none;
+  width: 14px;
+  margin-top: 4px;
+}
+.evidence-badge {
+  display: inline-block;
+  border: 1px solid #c7c7a9;
+  background: #efefdf;
+  color: #596146;
+  border-radius: 3px;
+  padding: 5px 8px;
+  margin: 16px 0 0;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.evidence-badge.comparator {
+  background: #f0e9dd;
+  border-color: #d7c7ae;
+  color: #826b4b;
+}
+.reference-detail {
+  font-size: 12px;
+  line-height: 1.9;
+  margin: 22px 0;
+  border-top: 1px solid #dbd1c0;
+  padding-top: 12px;
+  color: #776b58;
+}
+.reference-detail summary {
+  cursor: pointer;
+  color: #635745;
+}
+.reference-detail p {
+  margin: 10px 0;
+}
+.species-dossier {
+  padding: 36px 0;
+  border-top: 1px solid #d5cbbb;
+  margin-top: 22px;
+}
+.dossier-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 22px;
+}
+.dossier-heading .eyebrow {
+  flex-basis: 100%;
+}
+.dossier-heading h2 {
+  font-family: Georgia, "Noto Serif TC", serif;
+  font-weight: 500;
+  font-size: 25px;
+  margin: 0;
+}
+.dossier-heading > i {
+  color: #83725d;
+  font:
+    italic 16px Georgia,
+    serif;
+}
+.dossier-heading > p {
+  font-size: 12px;
+  color: #887a68;
+  margin: 0;
+}
+.dossier-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  margin-top: 27px;
+}
+.dossier-grid article {
+  border-top: 1px solid #d5c8b2;
+  padding-top: 16px;
+}
+.dossier-grid article > span {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #937750;
+}
+.dossier-grid p {
+  font-size: 13px;
+  line-height: 2;
+  color: #61584b;
+  margin: 12px 0 0;
+}
+.feature-links {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+.feature-links > span {
+  font-size: 11px;
+  color: #81715b;
+  margin-right: 5px;
+}
+.feature-links button {
+  background: #f6f0e4;
+  border: 1px solid #d5c8b3;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  color: #6a5037;
+  font-size: 12px;
+  cursor: pointer;
+}
+.feature-links button:hover {
+  background: #eae0cd;
+}
+.feature-links svg {
+  width: 13px;
+  height: 13px;
+}
+.taxonomy-note {
+  font-size: 12px;
+  line-height: 1.9;
+  color: #7a6b54;
+  max-width: 900px;
+}
+.dossier-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 20px;
+  margin-top: 22px;
+}
+.dossier-sources a {
+  font-size: 10px;
+  color: #877456;
+  text-underline-offset: 3px;
+}
+.species-comparison {
+  border-top: 1px solid #d4c8b2;
+  border-bottom: 1px solid #d4c8b2;
+  margin: 0 0 18px;
+}
+.species-comparison > summary {
+  padding: 20px 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+.species-comparison > summary > span {
+  float: right;
+  font-size: 11px;
+  color: #8b7d68;
+}
+.comparison-scroll {
+  overflow-x: auto;
+}
+.species-comparison table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  line-height: 1.8;
+  text-align: left;
+  min-width: 700px;
+}
+.species-comparison caption {
+  text-align: left;
+  padding: 8px 0 18px;
+  color: #877762;
+  font-size: 11px;
+}
+.species-comparison th,
+.species-comparison td {
+  border-top: 1px solid #ded3bf;
+  padding: 15px 14px;
+  vertical-align: top;
+  font-weight: 400;
+}
+.species-comparison tbody th {
+  min-width: 185px;
+}
+.species-comparison th i {
+  display: block;
+  font:
+    italic 12px Georgia,
+    serif;
+  color: #90816a;
+}
+.species-comparison a {
+  color: #694b2e;
+}
+.size-bar {
+  display: block;
+  height: 4px;
+  background: #b49b73;
+  margin-top: 9px;
+}
+.species-comparison td:nth-child(2) {
+  white-space: nowrap;
+}
+@media (max-width: 1100px) {
+  .species-nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .species-link {
+    padding: 13px 10px;
+    gap: 9px;
+  }
+  .species-number {
+    display: none;
+  }
+  .dossier-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .intro h1 {
+    font-size: 35px;
+  }
+  .species-title-break {
+    display: block;
+  }
+}
+@media (max-width: 600px) {
+  .species-nav {
+    grid-template-columns: repeat(3, 1fr);
+    border-radius: 6px;
+  }
+  .species-link {
+    padding: 11px 7px;
+    gap: 7px;
+    border-bottom: 1px solid #d6ccba;
+  }
+  .species-link strong {
+    font-size: 11px;
+  }
+  .species-link small {
+    font-size: 9px;
+  }
+  .species-swatch {
+    width: 15px;
+    height: 25px;
+  }
+  .species-context {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-bottom: 15px;
+  }
+  .species-context p {
+    flex-basis: 100%;
+    order: 3;
+    font-size: 11px;
+  }
+  .size-chip {
+    margin-left: auto;
+    padding-left: 12px;
+    font-size: 10px;
+  }
+  .species-title-break {
+    display: none;
+  }
+  .intro h1 {
+    font-size: 29px;
+  }
+  .dossier-grid {
+    gap: 16px;
+  }
+  .dossier-grid p {
+    font-size: 12px;
+  }
+  .dossier-heading h2 {
+    font-size: 22px;
+  }
+  .species-comparison > summary > span {
+    display: none;
+  }
+  .species-evidence {
+    font-size: 10px;
+  }
+  .feature-links {
+    gap: 7px;
+  }
+  .feature-links button {
+    font-size: 11px;
+    padding: 8px;
+  }
+  .species-dossier {
+    padding: 26px 0;
+  }
+  .dossier-sources {
+    gap: 10px;
+  }
+  .species-context > span:first-child {
+    font-size: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .species-link {
+    transition: none;
+  }
+}

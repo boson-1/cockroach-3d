@@ -280,3 +280,210 @@
 - 脂肪體參與儲存與代謝；共生菌利用尿素及氨等含氮產物的證據，不等於共生菌獨自完成所有尿酸分解。
 - 重複構造依文獻採取可辨識的數量；幾何位置、細小分支及成熟狀態仍是近似，不能把模型當作個體計數或量測資料。
 - 雌性與雄性生殖器官互斥顯示；一般昆蟲生殖原理與物種研究分開註記。
+
+## 五種新增物種的證據與模型差異（2026-09-09）
+
+- 德國蟑螂：Blattella germanica，10–15 mm；雙縱紋、雌雄體形，卵巢管每側約 20 條；雄性第 7、8 腹背板腺位置有本種研究。
+- 棕色蟑螂：Species File 現行 Validiblatta brunnea；舊文獻使用 Periplaneta brunnea。不是 P. fuliginosa。短粗尾鬚、較淡背板斑採物種資料；觸角感器說明採 1980 年研究的公開摘要。
+- 棕帶蟑螂：Supella longipalpa，臺灣名錄稱長鬚帶蠊；依補充照片分開重建雄性黃褐翅基紅褐橫帶與雌性深褐短翅；若蟲兩道鮮明淡帶不直接套在成蟲身上。第 4、5 腹背板費洛蒙腺採 1992 年定位研究，功能採 1993 年 PNAS。
+- 家屋蟑螂：對應家屋斑蠊 Neostylopyga rhombifolia；政府圖鑑可檢索條目載 20–30 mm、黑褐底淡斑、前翅縮小、後翅退化。模式種重新描述論文僅查得摘要，不用未讀圖版推造生殖器。
+
+### 實作範圍
+
+每種輸出獨立 HTML，採共同器官編號。家屋斑蠊移除 02 後翅及相應操作；65 是棕帶雌性背板腺，66 是德國雄性背板腺。背板腺是腺區位置示意，不是顯微孔道的三維掃描。
+
+新增物種的共有內臟以美洲蟑螂作明示的比較參考：頁面主文不把 150 條馬氏管、13 心室、8 胃盲囊、6 直腸墊等參考物種數量直接認作本種測量。比較模型仍保留這些幾何作空間理解，閱讀時須查看每部位證據標籤。除德國蟑螂約 20 條卵巢管以外，其他新增物種的卵巢管模型數量尚未逐種校準。
+
+體寬與翅長係數用於形態近似，並非從量測標本回歸的參數。自然色未經色卡校準；紋理是原創程序繪製，沒有嵌入受來源授權限制的照片。各頁的實體體長範圍另列，畫面一律適應視窗。
+
+### 本次圖鑑補充與澳洲家蠊
+
+澳洲家蠊採 Species File 的現行 Validiblatta australasiae，並保留圖鑑的 Periplaneta australasiae。成蟲的前翅基部外側黃橙縱紋、深色背板與鮮明淡黃邊紋、雌雄腹端差異，以使用者節錄及 UF/IFAS EENY623 交叉核對。前翅色紋僅限外側基部，沒有延伸成整片黃框。27–35 mm 採圖鑑；UF 記錄約 32–35 mm，來源範圍不同，不用模型作量測。
+
+本次七張補充頁面也校正另外四種：棕色家蠊改為深紅褐翅面與較模糊的錨形背板斑；家屋斑蠊改為黑底、前緣 M 形、中央四淡斑與腹部側緣小斑；棕帶成蟲依雌雄分開繪製翅色，不直接採用若蟲的鮮明雙白帶；德國姬蠊保留黃褐色、双縱紋與淡色足。斑紋代表近似個體，並非每個個體完全相同的模板。這些節錄列為獨立來源，出版社連結僅證實書目；未聲稱已讀全書，也未將掃描頁加入發佈產物。
+
+### 新增來源與已讀範圍
+
+#### australianUF — Australian Cockroach · EENY623 / IN1088
+
+Shiyao Jiang & Phillip E. Kaufman · University of Florida / IFAS · 大學物種資料 · 成蟲與腹端照片
+
+[Australian Cockroach · EENY623 / IN1088](https://ask.ifas.ufl.edu/publication/IN1088)
+
+成蟲約 32–35 mm；紅褐至深褐色、前翅外側基部淡黃縱紋、雌雄完整翅及腹端腹刺差異。並核對棲地與產卵鞘習性；未將發育時間或卵數視為固定值。
+
+#### australianTaxonomy — Validiblatta australasiae · current taxonomic combination
+
+Blattodea Working Group · Blattodea Species File · 分類學資料庫
+
+[Validiblatta australasiae · current taxonomic combination](https://cockroach.speciesfile.org/otus/863239)
+
+現行有效名稱、Periplaneta australasiae 等歷史組合，及 2025 年分類修訂書目。2026-09-09 查核。
+
+#### australianGallery — Australian cockroach, Periplaneta australasiae
+
+University of Florida / IFAS · Cockroach species gallery · 大學物種資料
+
+[Australian cockroach, Periplaneta australasiae](https://entnemdept.ufl.edu/projex/gallery/dl/cockroaches/text/australian_cockroach.htm)
+
+紅褐至深褐體色、翅基黃紋、尾鬚寬而較鈍，雌雄具發達翅。用於外形比較，未推估本種內臟比例。
+
+#### australianAtlas — 台灣常見室內節肢動物圖鑑 · 澳洲家蠊節錄
+
+李鍾旻、詹美鈴 · 聯經 · 2021 · ISBN 9789570860054 · 使用者提供的圖鑑節錄
+
+[台灣常見室內節肢動物圖鑑 · 澳洲家蠊節錄](https://store.linkingbooks.com.tw/product/141181)
+
+第 52 頁起的節錄：體長 27–35 mm、暗紅褐色、前胸背板鮮明淡黃邊紋、前翅基部外側黃橙縱紋與足部棘刺。成蟲與若蟲照片分開解讀。 依使用者於 2026-09-09 提供的頁面及照片核對；連結是出版社書目，不是節錄全文。照片僅用於比對，未嵌入網站。
+
+#### germanAtlas — 台灣常見室內節肢動物圖鑑 · 德國姬蠊節錄
+
+李鍾旻、詹美鈴 · 聯經 · 2021 · ISBN 9789570860054 · 使用者提供的圖鑑節錄
+
+[台灣常見室內節肢動物圖鑑 · 德國姬蠊節錄](https://store.linkingbooks.com.tw/product/141181)
+
+黃褐色成蟲、前胸背板兩道平行暗縱紋、米白至黃褐色足，及雌雄體形差異。 依使用者於 2026-09-09 提供的頁面及照片核對；連結是出版社書目，不是節錄全文。照片僅用於比對，未嵌入網站。
+
+#### brownAtlas — 台灣常見室內節肢動物圖鑑 · 棕色家蠊節錄
+
+李鍾旻、詹美鈴 · 聯經 · 2021 · ISBN 9789570860054 · 使用者提供的圖鑑節錄
+
+[台灣常見室內節肢動物圖鑑 · 棕色家蠊節錄](https://store.linkingbooks.com.tw/product/141181)
+
+深紅褐色光澤、模糊且有時近錨形的黃褐背板斑、均勻紅褐前翅和短粗尾鬚。圖鑑體長 25–35 mm；頁面標題另採 UF 的 33–38 mm，並非同一批樣本。 依使用者於 2026-09-09 提供的頁面及照片核對；連結是出版社書目，不是節錄全文。照片僅用於比對，未嵌入網站。
+
+#### bandedAtlas — 台灣常見室內節肢動物圖鑑 · 棕帶姬蠊節錄
+
+李鍾旻、詹美鈴 · 聯經 · 2021 · ISBN 9789570860054 · 使用者提供的圖鑑節錄
+
+[台灣常見室內節肢動物圖鑑 · 棕帶姬蠊節錄](https://store.linkingbooks.com.tw/product/141181)
+
+雄成蟲黃褐色、翅基紅褐橫帶及前後淡區；雌成蟲較深色、腹寬翅短；若蟲有尤其明顯的兩條米白橫帶。外觀重建按雌雄與發育期區分。 依使用者於 2026-09-09 提供的頁面及照片核對；連結是出版社書目，不是節錄全文。照片僅用於比對，未嵌入網站。
+
+#### harlequinAtlas — 台灣常見室內節肢動物圖鑑 · 家屋斑蠊節錄
+
+李鍾旻、詹美鈴 · 聯經 · 2021 · ISBN 9789570860054 · 使用者提供的圖鑑節錄
+
+[台灣常見室內節肢動物圖鑑 · 家屋斑蠊節錄](https://store.linkingbooks.com.tw/product/141181)
+
+第 58–59 頁：黑色底、淡黃 M 形前緣與中央對稱斑；腹背板以側緣不規則斑為主、中央可無斑或有細淡橫斑。雌雄前翅縮小且無後翅，足淡黃而棘刺黑。 依使用者於 2026-09-09 提供的頁面及照片核對；連結是出版社書目，不是節錄全文。照片僅用於比對，未嵌入網站。
+
+#### germanUF — German Cockroach, Blattella germanica · EENY-002
+
+S. Valles · University of Florida / IFAS · 大學物種資料
+
+[German Cockroach, Blattella germanica · EENY-002](https://ask.ifas.ufl.edu/publication/IN128)
+
+10–15 mm、前胸背板雙縱紋、雌雄體形及攜卵鞘習性；翅形依該頁成蟲照片作近似重建。
+
+#### germanOvary — Brownie, a Gene Involved in Building Complex Respiratory Devices in Insect Eggshells
+
+Irles, Bellés & Piulachs · PLOS ONE · 2009 · 本種研究 · 卵巢與卵殼
+
+[Brownie, a Gene Involved in Building Complex Respiratory Devices in Insect Eggshells](https://doi.org/10.1371/journal.pone.0008353)
+
+德國蟑螂每側卵巢約 20 條無滋養細胞型卵巢管；每繁殖週期主要為基部卵母細胞成熟。模型數量依此調整，細胞與卵殼並未重建。
+
+#### germanGland — Behavioral and Morphological Studies of the Membranous Tergal Structure of Male Blattella germanica During Courtship
+
+Journal of Insect Science · 2019 · 本種研究 · 雄性背腺
+
+[Behavioral and Morphological Studies of the Membranous Tergal Structure of Male Blattella germanica During Courtship](https://pmc.ncbi.nlm.nih.gov/articles/PMC6804909/)
+
+雄性第 7、8 腹背板求偶腺及相關膜質構造。模型標示腺區和凹陷位置，不宣稱重現腺細胞微細結構。
+
+#### brownUF — Brown cockroach, Periplaneta brunnea
+
+T. R. Fasulo & R. W. Baldwin · UF/IFAS · 大學物種資料
+
+[Brown cockroach, Periplaneta brunnea](https://entnemdept.ufl.edu/projex/gallery/dl/Cockroaches/text/brown_cockroach.htm)
+
+成蟲約 33–38 mm、紅褐體色、短粗尾鬚、雌雄發達翅與環境偏好。此頁保留當時使用的舊學名。
+
+#### brownTaxonomy — Validiblatta brunnea · current taxonomic combination
+
+Blattodea Working Group · Blattodea Species File · 分類學資料庫
+
+[Validiblatta brunnea · current taxonomic combination](https://cockroach.speciesfile.org/otus/863254)
+
+現行屬名及異名，收錄 Luo et al. 2025 的 Blattinae 分類修訂。2026-09-09 查核。
+
+#### blattinaeRevision — Revision of the cockroach subfamily Blattinae based on morphological and molecular analyses
+
+Luo et al. · Systematic Entomology 50: 836–854 · 2025 · 同儕審查研究 · 分類修訂
+
+[Revision of the cockroach subfamily Blattinae based on morphological and molecular analyses](https://doi.org/10.1111/syen.12680)
+
+形態及分子分類修訂的背景；最終有效名稱另外以 Species File 的現行條目核對。
+
+#### brownCanada — The Insects and Arachnids of Canada, Part 14 · Periplaneta brunnea, p. 101
+
+Vickery & Kevan · Agriculture Canada · 1985 · 政府分類專著
+
+[The Insects and Arachnids of Canada, Part 14 · Periplaneta brunnea, p. 101](https://publications.gc.ca/collections/collection_2016/aac-aafc/agrhist/A42-42-1985-14-eng.pdf)
+
+前胸背板不鮮明暗斑、全褐發達前翅與短尾鬚；雌雄肛上板鑑別。尺寸因樣本及測量方式異於 UF，不混成固定標準。歷史原產地敘述不採用。
+
+#### brownAntenna — External Appearance of Periplaneta brunnea Antennae and Their Electroantennogram Responses to Odorous Compounds
+
+Agricultural and Biological Chemistry 44(7): 1461 · 1980 · 本種研究 · 電顯及觸角電位
+
+[External Appearance of Periplaneta brunnea Antennae and Their Electroantennogram Responses to Odorous Compounds](https://academic.oup.com/bbb/article/44/7/1461/5970701)
+
+核對公開摘要：雌雄成蟲觸角具多類感覺毛，雄性嗅覺感器較多。未按顯微照片逐一重建感器種類或密度。
+
+#### bandedUF — Brownbanded cockroach, Supella longipalpa
+
+T. R. Fasulo & R. W. Baldwin · UF/IFAS · 大學物種資料
+
+[Brownbanded cockroach, Supella longipalpa](https://entnemdept.ufl.edu/projex/gallery/dl/cockroaches/text/brownbanded_cockroach.htm)
+
+約 13–14.5 mm、兩道淡褐翅帶；雌性較深且寬、翅短於腹部，雄性長翅；家具與高處藏身位置。
+
+#### bandedTaiEOL — Supella longipalpa · 長鬚帶蠊
+
+臺灣生命大百科 · 臺灣物種名錄
+
+[Supella longipalpa · 長鬚帶蠊](https://taieol.tw/pages/75736)
+
+核對長鬚帶蠊與棕帶蟑螂等俗名，以及頭、背板與翅基的外觀敘述。
+
+#### bandedGland — Site of Pheromone Production in Female Supella longipalpa: Behavioral, Electrophysiological, and Morphological Evidence
+
+Schal et al. · Annals of the Entomological Society of America 85: 605–611 · 1992 · 本種研究 · 費洛蒙腺定位
+
+[Site of Pheromone Production in Female Supella longipalpa: Behavioral, Electrophysiological, and Morphological Evidence](https://doi.org/10.1093/aesa/85.5.605)
+
+雌性第 4、5 腹背板、尤其側緣的表皮腺及孔道；模型標示腺區位置，孔洞與導管的微米尺度並未重建。
+
+#### bandedPheromone — Sex pheromone for the brownbanded cockroach is an unusual dialkyl-substituted alpha-pyrone
+
+Charlton et al. · PNAS 90: 10202–10205 · 1993 · 本種研究 · 費洛蒙化學
+
+[Sex pheromone for the brownbanded cockroach is an unusual dialkyl-substituted alpha-pyrone](https://doi.org/10.1073/pnas.90.21.10202)
+
+雌性性費洛蒙 supellapyrone 的分離、鑑定及合成驗證；用於說明器官功能，不作幾何形狀依據。
+
+#### harlequinTaiEOL — Neostylopyga rhombifolia · 家屋斑蠊
+
+臺灣生命大百科 · 臺灣物種名錄
+
+[Neostylopyga rhombifolia · 家屋斑蠊](https://taieol.tw/pages/75774)
+
+家屋斑蠊與花斑蟑螂等中文名對應；使用其照片作外觀查核，照片未嵌入本站。
+
+#### harlequinGuide — 台江昆蟲圖鑑 · 家屋斑蠊
+
+台江國家公園管理處 · 政府自然觀察圖鑑
+
+[台江昆蟲圖鑑 · 家屋斑蠊](https://ws.moi.gov.tw/001/Upload/415/ebook/ebook_180690/pdf/full.pdf)
+
+可檢索物種條目：體長約 20–30 mm、黑褐底及白／淺褐斑、前翅退化為小片、後翅完全退化。PDF 下載端回應不穩定，未聲稱已逐頁核對全書。
+
+#### harlequinRevision — New data on the genus Neostylopyga Shelford, 1911, with description of a new species from Laos
+
+L. N. Anisyutkin · Entomological Review 90: 871–876 · 2010 · 分類研究 · 公開摘要
+
+[New data on the genus Neostylopyga Shelford, 1911, with description of a new species from Laos](https://doi.org/10.1134/S0013873810070055)
+
+摘要確認重新描述模式種 N. rhombifolia；未取得可核對的完整生殖器圖版，因此不據此繪製本種精細生殖器。

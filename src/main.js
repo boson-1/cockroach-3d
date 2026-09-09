@@ -28,15 +28,14 @@ import {
   Check,
   Eye,
 } from "lucide";
-import {
-  organs,
-  organById,
-  systems,
-  systemById,
-  sources,
-  getOrgans,
-  requiredDepth,
-} from "./data.js";
+import { createAtlasData, systems, systemById } from "./atlas-data.js";
+import { speciesList, speciesFromPath, layersFor } from "./species.js";
+const species = speciesFromPath(location.pathname);
+const { organs, organById, sources, getOrgans, requiredDepth } =
+  createAtlasData(species);
+const layerOptions = layersFor(species);
+document.title = species.name + " · 蟑螂解剖室";
+document.documentElement.dataset.species = species.id;
 import { createSpecimen, createBook } from "./specimen.js";
 
 const icons = {
@@ -84,19 +83,21 @@ document.querySelector("#app").innerHTML = `
   <a class="skip-link" href="#workspace">跳至互動圖鑑</a>
   <header class="site-header">
     <a class="brand" href="./" aria-label="蟑螂解剖室首頁"><span class="brand-mark">${icon("book-open")}</span><span>微觀自然<span class="brand-en">THE SMALL WORLD</span></span></a>
-    <div class="edition">自然觀察手帖 <span>／</span> VOL. 001</div>
+    <div class="edition">自然觀察手帖 <span>／</span> VOL. 00${species.number.slice(-1)}</div>
     <button class="text-button" id="sources-open">文獻與製作筆記 ${icon("arrow-up-right")}</button>
   </header>
   <main>
     <section class="intro" aria-labelledby="page-title">
-      <div><div class="eyebrow"><span></span> AN INTERACTIVE ANATOMY ATLAS</div><h1 id="page-title">蟑螂<span class="title-dot">，</span>一層一層看。</h1></div>
-      <div class="intro-right"><p>掀開一對翅，走進一個微小而精密的世界。<br>從外骨骼到內部器官，親手翻閱牠的身體。</p><span class="specimen-meta"><i>Periplaneta americana</i><span>美洲蟑螂 · 成蟲</span></span></div>
+      <div><div class="eyebrow"><span></span> AN INTERACTIVE ANATOMY ATLAS</div><h1 id="page-title">${species.name}<span class="title-dot">，</span><br class="species-title-break">一層一層看。</h1></div>
+      <div class="intro-right"><p>${species.tagline}<br>從外骨骼到內部器官，親手翻閱牠的身體。</p><span class="specimen-meta"><i>${species.latin}</i><span>${species.formal} · 成蟲</span></span></div>
     </section>
+    <nav class="species-nav" aria-label="選擇蟑螂物種">${speciesList.map((s) => `<a href="./${s.page}" class="species-link ${s.id === species.id ? "current" : ""}" ${s.id === species.id ? 'aria-current="page"' : ""}><span class="species-swatch ${s.pattern}" aria-hidden="true"></span><span><strong>${s.name}</strong><small>${s.size}</small></span><span class="species-number">${s.number}</span></a>`).join("")}</nav>
+    <div class="species-context"><span>標本 ${species.number} / ${String(speciesList.length).padStart(2, "0")}</span><p>${species.diagnostic}</p><span class="size-chip">體長 ${species.size}</span></div>
     <nav class="system-tabs" aria-label="探索器官系統">${systems.map((s, i) => `<button data-system="${s.id}" class="system-tab ${i === 0 ? "active" : ""}" aria-pressed="${i === 0}" style="--system-color:${s.color}">${icon(s.icon)}<span>${s.name}</span><span class="tab-index">0${i + 1}</span></button>`).join("")}</nav>
     <section class="workbench" id="workspace" aria-label="互動立體解剖圖鑑">
       <aside class="layer-panel">
         <div class="panel-kicker">翻閱層次 <span>LAYERS</span></div>
-        <div class="layer-list" aria-label="解剖深度">${["完整外觀", "掀開前翅", "展開後翅", "打開外骨骼"].map((s, i) => `<button class="layer-button ${i === 0 ? "active" : ""}" data-depth="${i}" aria-pressed="${i === 0}"><span class="layer-number">${i === 0 ? "○" : pad(i)}</span><span>${s}</span>${icon("chevron-right")}</button>`).join("")}</div>
+        <div class="layer-list" aria-label="解剖深度">${layerOptions.map(({ label: s, depth: i }) => `<button class="layer-button ${i === 0 ? "active" : ""}" data-depth="${i}" aria-pressed="${i === 0}"><span class="layer-number">${i === 0 ? "○" : pad(i)}</span><span>${s}</span>${icon("chevron-right")}</button>`).join("")}</div>
         <button class="open-all" id="open-all">${icon("layers")}<span>逐層展開</span>${icon("arrow-right")}</button>
         <div class="sex-control"><label>觀察標本</label><div role="group" aria-label="標本性別"><button data-sex="female" class="active" aria-pressed="true">♀ 雌性</button><button data-sex="male" aria-pressed="false">♂ 雄性</button></div></div>
         <div class="index-heading"><span id="list-title">本頁部位</span><span id="list-count"></span></div>
@@ -104,20 +105,23 @@ document.querySelector("#app").innerHTML = `
         <div class="layer-footnote"><span class="small-rule"></span><span>沿著編號，認識每一個部位。</span></div>
       </aside>
       <div class="stage" id="stage">
-        <div class="stage-heading"><span>PLATE 01 <span class="hairline">/</span> <span id="plate-title">外部構造</span></span><span class="live-indicator">3D 標本</span></div>
-        <canvas id="specimen-canvas" aria-label="美洲蟑螂立體模型。滑鼠移至覆蓋層可掀開，點按可固定；也可使用左側按鈕與器官目錄。" tabindex="0"></canvas>
+        <div class="stage-heading"><span>PLATE ${species.number} <span class="hairline">/</span> <span id="plate-title">外部構造</span></span><span class="live-indicator">3D 標本</span></div>
+        <canvas id="specimen-canvas" aria-label="${species.name}立體模型。滑鼠移至覆蓋層可掀開，點按可固定；也可使用左側按鈕與器官目錄。" tabindex="0"></canvas>
         <div class="render-controls" role="group" aria-label="模型配色"><button data-palette="natural" class="active" aria-pressed="true">自然配色</button><button data-palette="system" aria-pressed="false">系統配色</button><span id="render-mode-note">外觀近似原色</span></div>
         <div id="markers" class="markers"></div>
         <div class="model-fallback" id="model-fallback" hidden><h2>目前無法顯示 3D 標本</h2><p>瀏覽器需要支援 WebGL 2。你仍可透過左側器官目錄閱讀完整圖鑑與文獻。</p></div>
         <div class="orientation"><span>頭側</span><span class="axis-line"></span><span>腹端</span></div>
         <div class="view-tools" role="group" aria-label="模型視角"><button data-view="book" class="active" aria-pressed="true">立體</button><button data-view="top" aria-pressed="false">俯視</button><button data-view="side" aria-pressed="false">側面</button><button data-view="ventral" aria-pressed="false">腹面</button></div>
         <div class="canvas-tools"><button id="labels-toggle" title="切換部位標註" aria-label="切換部位標註" aria-pressed="true">${icon("scan")}</button><span></span><button id="zoom-in" title="放大" aria-label="放大">${icon("plus")}</button><button id="zoom-out" title="縮小" aria-label="縮小">${icon("minus")}</button><button id="reset-view" title="還原標本" aria-label="還原標本">${icon("rotate-ccw")}</button></div>
-        <div class="hover-cue" id="hover-cue">${icon("mouse-pointer-2")}<span>移到翅上，試著掀開它</span><span class="cue-arrow">↗</span></div>
-        <div class="stage-bottom"><span id="depth-caption">外觀 · 尚未掀頁</span><span>形態重建 · 非掃描標本</span></div>
+        <div class="hover-cue" id="hover-cue">${icon("mouse-pointer-2")}<span>${species.reducedWings ? "移到胸部小翅片，開始探索" : "移到翅上，試著掀開它"}</span><span class="cue-arrow">↗</span></div>
+        <div class="stage-bottom"><span id="depth-caption">外觀 · 尚未掀頁</span><span>各頁放大展示 · 非等比例尺</span></div>
       </div>
       <aside class="detail-panel" aria-label="器官解說"><div id="organ-detail" aria-live="polite"></div><div class="detail-navigation"><button id="prev-organ" aria-label="上一個部位">${icon("arrow-left")}</button><span id="detail-position"></span><button id="next-organ" aria-label="下一個部位">${icon("arrow-right")}</button></div></aside>
     </section>
+    <p class="species-evidence">${icon("info")}<span>${species.evidence}</span></p>
     <section class="reading-strip" aria-label="操作提示"><div>${icon("mouse-pointer-2")}<span><strong>移入掀開</strong>，移開自動闔上</span></div><div>${icon("layers")}<span><strong>點按固定</strong>，逐層探索內部</span></div><div>${icon("move")}<span><strong>拖曳轉動</strong>，滾輪縮放標本</span></div><button id="help-open">操作說明 ${icon("info")}</button></section>
+    <section class="species-dossier" aria-label="本種觀察筆記"><div class="dossier-heading"><span class="eyebrow">SPECIES FIELD NOTES</span><h2>${species.formal}的辨識筆記</h2><i>${species.latin}</i>${species.synonym ? `<p>文獻舊名：<i>${species.synonym}</i></p>` : ""}</div><div class="dossier-grid"><article><span>01 / 形態</span><p>${species.diagnostic}</p></article><article><span>02 / 雌雄</span><p id="sex-field-note">${species.sexNote}</p></article><article><span>03 / 環境</span><p>${species.habitat}</p></article><article><span>04 / 生殖</span><p>${species.reproduction}</p></article></div><div class="feature-links"><span>重點觀察</span>${species.featureParts.map((id) => `<button data-organ="${id}">${pad(id)} · ${organById.get(id).name} ${icon("arrow-up-right")}</button>`).join("")}</div>${species.taxonomyNote ? `<p class="taxonomy-note">${species.taxonomyNote}</p>` : ""}<div class="dossier-sources">${species.refs.map((ref) => `<a href="${sources[ref].url}" target="_blank" rel="noopener noreferrer">${sources[ref].author} ↗</a>`).join("")}</div></section>
+    <details class="species-comparison"><summary>${speciesList.length} 種蟑螂，並排比較 <span>體長與主要辨識線索</span></summary><div class="comparison-scroll"><table><caption>體長範圍來自各物種引用來源；個體與測量方式可能不同。3D 畫面各自放大，不能用畫面大小比較體長。</caption><thead><tr><th scope="col">物種</th><th scope="col">成蟲體長</th><th scope="col">辨識線索</th><th scope="col">成蟲翅</th></tr></thead><tbody>${speciesList.map((s) => `<tr><th scope="row"><a href="./${s.page}">${s.name}</a><i>${s.latin}</i></th><td>${s.size}<span class="size-bar" style="width:${s.mm * 2}px"></span></td><td>${s.diagnostic}</td><td>${s.sexNote}</td></tr>`).join("")}</tbody></table></div></details>
     <section class="field-note"><div class="note-number">01<span>FIELD NOTE</span></div><div><h2>小小的身體，六套協作的系統。</h2><p>呼吸不靠肺，循環不靠紅色的血。選擇上方系統，觀察每個器官的位置與分工。<br>這本圖鑑以雌性成蟲起始；切換雄性標本，可以比較生殖系統的差異。</p></div><div class="progress-note"><span><strong id="seen-count">1</strong> / ${organs.length}</span><span>已探索的部位</span></div></section>
     <footer><span>微觀自然 <span class="footer-dot">·</span> 蟑螂解剖室</span><span>形態與解剖重建 × 可追溯的科學知識</span><button class="text-button" id="sources-footer">查看 ${Object.keys(sources).length} 筆參考資料 ${icon("arrow-up-right")}</button></footer>
   </main>
@@ -143,7 +147,7 @@ function renderList() {
 function renderDetail() {
   const o = organById.get(state.selected),
     s = systemById.get(o.system);
-  detail.innerHTML = `<div class="detail-kicker"><span>部位觀察</span><span style="color:${s.color}">${s.name}</span></div><div class="detail-title"><span class="big-number" style="color:${s.color}">${pad(o.id)}</span><span class="specimen-stamp">ANATOMY<br>FIELD NOTES</span></div><h2>${o.name}</h2><p class="latin">${o.en}</p><div class="location">${icon("scan")}<span>${o.location}</span></div><button id="inspect-part" class="inspect-part ${state.isolated ? "active" : ""}" aria-pressed="${state.isolated}">${icon("maximize")} ${state.isolated ? "返回完整標本" : "局部放大觀察"}</button><p class="organ-summary">${o.description}</p><p class="organ-body">${o.detail}</p><div class="did-you-know"><span>${icon("eye")} 觀察筆記</span><p>${o.note}</p></div><div class="source-links"><span>資料依據</span>${o.refs.map((ref) => `<a href="${sources[ref].url}" target="_blank" rel="noopener noreferrer" title="${sources[ref].title}">${sources[ref].label ?? sources[ref].author}${icon("arrow-up-right")}</a>`).join("")}</div>`;
+  detail.innerHTML = `<div class="detail-kicker"><span>部位觀察</span><span style="color:${s.color}">${s.name}</span></div><div class="detail-title"><span class="big-number" style="color:${s.color}">${pad(o.id)}</span><span class="specimen-stamp">ANATOMY<br>FIELD NOTES</span></div><h2>${o.name}</h2><p class="latin">${o.en}</p><div class="location">${icon("scan")}<span>${o.location}</span></div><button id="inspect-part" class="inspect-part ${state.isolated ? "active" : ""}" aria-pressed="${state.isolated}">${icon("maximize")} ${state.isolated ? "返回完整標本" : "局部放大觀察"}</button><div class="evidence-badge ${o.referenceDetail ? "comparator" : ""}">${o.evidence}</div><p class="organ-summary">${o.description}</p><p class="organ-body">${o.detail}</p><div class="did-you-know"><span>${icon("eye")} 觀察筆記</span><p>${o.note}</p></div>${o.referenceDetail ? `<details class="reference-detail"><summary>比較來源的詳細解說</summary><p><strong>參考物種：美洲蟑螂</strong></p><p>${o.referenceDetail}</p></details>` : ""}<div class="source-links"><span>資料依據</span>${o.refs.map((ref) => `<a href="${sources[ref].url}" target="_blank" rel="noopener noreferrer" title="${sources[ref].title}">${sources[ref].label ?? sources[ref].author}${icon("arrow-up-right")}</a>`).join("")}</div>`;
   const list = getOrgans(state.system, state.sex);
   document.querySelector("#detail-position").textContent =
     `${pad(list.findIndex((x) => x.id === o.id) + 1)} / ${pad(list.length)}`;
@@ -152,6 +156,7 @@ function renderDetail() {
 }
 function setDepth(depth) {
   state.depth = Math.max(0, Math.min(3, depth));
+  if (species.reducedWings && state.depth === 2) state.depth = 3;
   if (specimen) {
     specimen.state.depth = state.depth;
     specimen.state.preview = null;
@@ -168,7 +173,9 @@ function setDepth(depth) {
     state.depth === 3 ? "闔上所有翻片" : "逐層展開";
   document.querySelector("#depth-caption").textContent = [
     "外觀 · 尚未掀頁",
-    "第一層 · 前翅已掀開",
+    species.reducedWings
+      ? "退化前翅已掀開 · 本種無後翅"
+      : "第一層 · 前翅已掀開",
     "第二層 · 後翅已展開",
     "第三層 · 內部器官",
   ][state.depth];
@@ -219,6 +226,7 @@ function setSex(sex, select = true) {
   else {
     specimen?.style(state.system, state.selected, state.sex);
     renderList();
+    renderDetail();
     buildMarkers();
   }
 }
@@ -253,7 +261,7 @@ function buildMarkers() {
     ]),
   ].filter((id) => {
     const o = organById.get(id);
-    return !o.sex || o.sex === state.sex;
+    return o && (!o.sex || o.sex === state.sex);
   });
   document.querySelector("#markers").innerHTML =
     '<svg class="marker-leaders" aria-hidden="true"></svg>' +
@@ -324,7 +332,7 @@ try {
   scene.add(group);
   const specimenFloor = createBook();
   group.add(specimenFloor);
-  specimen = createSpecimen();
+  specimen = createSpecimen(species);
   group.add(specimen.root);
   specimen.state.reduced = reduced.matches;
   specimen.style(state.system, state.selected, state.sex);
@@ -513,7 +521,7 @@ try {
     const f = result ? findFlap(result.object) : null;
     // Keep a lifted flap open until leaving the specimen. Re-raycasting only the
     // moving flap would oscillate as it leaves the pointer's original position.
-    if (!hoverLocked && f && f.index === state.depth) {
+    if (!hoverLocked && f && f.previewDepth === state.depth) {
       hoverFlap = f;
       specimen.state.preview = f;
       hoverLocked = true;
@@ -538,7 +546,7 @@ try {
       const result = hit(e);
       const f = hoverFlap || (result ? findFlap(result.object) : null);
       if (f) {
-        setDepth(state.depth > f.index ? f.index : f.index + 1);
+        setDepth(state.depth > f.index ? f.previewDepth : f.index + 1);
         selectOrgan(f.id, { open: false });
       } else if (result?.object.userData.organId)
         selectOrgan(result.object.userData.organId);
@@ -569,7 +577,18 @@ try {
   canvas.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       e.preventDefault();
-      setDepth(state.depth + (e.key === "ArrowRight" ? 1 : -1));
+      const index = layerOptions.findIndex((l) => l.depth === state.depth);
+      setDepth(
+        layerOptions[
+          Math.max(
+            0,
+            Math.min(
+              layerOptions.length - 1,
+              index + (e.key === "ArrowRight" ? 1 : -1),
+            ),
+          )
+        ].depth,
+      );
     } else if (e.key === "Escape") {
       setDepth(0);
     } else if (e.key === "+" || e.key === "=")
@@ -600,7 +619,14 @@ document.addEventListener("click", (e) => {
   if (depth) {
     setDepth(Number(depth.dataset.depth));
     if (state.depth < 3 && state.system !== "external")
-      selectOrgan([1, 2, 3][Math.min(state.depth, 2)], { open: false });
+      selectOrgan(
+        species.reducedWings
+          ? state.depth === 0
+            ? 1
+            : 3
+          : [1, 2, 3][Math.min(state.depth, 2)],
+        { open: false },
+      );
   }
   const palette = e.target.closest("[data-palette]");
   if (palette) {
@@ -693,7 +719,7 @@ function showNotes(kind) {
     <div class="help-grid"><article><span>01</span><h3>滑過與掀開</h3><p>把滑鼠移到前翅、後翅或背板上，翻片會抬起。移到標本之外，暫時掀起的翻片會闔上。</p></article><article><span>02</span><h3>點按與固定</h3><p>點一下翻片，固定展開到該層。也可直接使用左側「翻閱層次」或「逐層展開」。手機使用相同的點按方式。</p></article><article><span>03</span><h3>探索每個部位</h3><p>點編號或器官目錄，右頁會顯示位置、功能與來源。切換系統會自動打開外層，並淡化其他器官。按「局部放大觀察」可獨立檢視所選構造；腹面視角可查看口器、跗墊與末端腹板。</p></article><article><span>04</span><h3>轉動與鍵盤</h3><p>拖曳標本可轉動；滾輪或 ＋／－ 可縮放。聚焦模型後，左右方向鍵控制層次，Esc 闔上。Tab 可巡覽所有操作，Enter 或空白鍵啟動按鈕。</p></article></div>
     <p class="method-note">系統會尊重「減少動態效果」偏好。若瀏覽器無法使用 WebGL 2，仍可由器官目錄閱讀所有文字與來源。</p>`
       : `
-    <div class="method-note"><h3>從立體書出發，重新建構。</h3><p>互動架構參考使用者提供的五張立體書照片：成對翅片、可掀背板、編號索引及旁頁解說。01–16 延續照片中的部位編號，17–64 補充口器、足節、體壁、感官、內部細部構造與雌雄差異。這本立體書的書名、作者與版次無法僅由照片確認，因此不臆造書目。</p><p>外觀另參考使用者補充的兩張《台灣常見室內節肢動物圖鑑》美洲家蠊節錄，並依出版社資料核對李鍾旻、詹美鈴與 2021 年出版資訊。紅褐色翅面、背板斑紋、腎形複眼、觸角與棘刺已納入模型。斑紋有個體差異；節錄中的若蟲照片與成蟲模型分開解讀。</p><p>本站文字重新整理，3D 模型與紋理以程式原創繪製，未嵌入原書照片或掃描圖。資料以美洲蟑螂成蟲為主；一般昆蟲生理知識標示為大學教學來源，物種研究標示為同儕審查研究。</p><p><strong>閱讀界線：</strong>這是依照片與文獻製作的形態重建。外骨骼、翅與背板以曲面呈現，預設自然配色；內臟顏色參考可辨識的組織外觀，會受光線、保存方式與個體狀態影響。系統配色是另外提供的辨識工具。掀開路徑是展示操作，不代表活體關節；尚未導入原始 CT 分割或逐一校準尺寸，不能宣稱為可量測的解剖標本。背血管位於背側、神經索位於腹側；選擇系統會讓其他構造淡化，便於觀察重疊器官。</p><p>摘要與公開全文依可取得範圍核對。部分歷史文獻只有書目可讀，已在資料範圍註明，未把未讀內容當作實驗結論。形態增修核對日期：2026-09-09。</p></div>
+    <div class="method-note"><h3>從立體書出發，重新建構。</h3><p>互動架構參考使用者提供的五張立體書照片：成對翅片、可掀背板、編號索引及旁頁解說。01–16 延續照片中的部位編號，17–64 補充口器、足節、體壁、感官、內部細部構造與雌雄差異。這本立體書的書名、作者與版次無法僅由照片確認，因此不臆造書目。</p><p>外觀另參考使用者提供的《台灣常見室內節肢動物圖鑑》美洲家蠊節錄，以及後續補充的澳洲、棕色、家屋、德國與棕帶蟑螂頁面，並依出版社資料核對李鍾旻、詹美鈴與 2021 年出版資訊。紅褐色翅面、背板斑紋、腎形複眼、觸角與棘刺已納入模型。斑紋有個體差異；家屋斑蠊以黑底、淡黃側斑為主，棕帶蟑螂按雌雄成蟲分別繪製翅面。節錄中的若蟲照片與成蟲模型分開解讀。</p><p><strong>本頁：${species.name}（${species.latin}）。</strong>${species.evidence} ${species.taxonomyNote || ""} 新增物種的內臟參考條目會直接標明比較來源，不能把美洲蟑螂的數量與實驗結果換名套用。家屋斑蠊的後翅完全移除；棕帶蟑螂雌雄切換會改變翅長與翅面色斑。澳洲家蠊加入前翅基部外側黃縱紋及本種腹端性別資料。德國蟑螂卵巢管、雄性背腺與棕帶蟑螂雌性背板腺依本種研究補入。</p><p>本站文字重新整理，3D 模型與紋理以程式原創繪製，未嵌入原書照片或掃描圖。資料以美洲蟑螂成蟲為主；一般昆蟲生理知識標示為大學教學來源，物種研究標示為同儕審查研究。</p><p><strong>閱讀界線：</strong>這是依照片與文獻製作的形態重建。外骨骼、翅與背板以曲面呈現，預設自然配色；內臟顏色參考可辨識的組織外觀，會受光線、保存方式與個體狀態影響。系統配色是另外提供的辨識工具。掀開路徑是展示操作，不代表活體關節；尚未導入原始 CT 分割或逐一校準尺寸，不能宣稱為可量測的解剖標本。背血管位於背側、神經索位於腹側；選擇系統會讓其他構造淡化，便於觀察重疊器官。</p><p>摘要與公開全文依可取得範圍核對。部分歷史文獻只有書目可讀，已在資料範圍註明，未把未讀內容當作實驗結論。形態增修核對日期：2026-09-09。</p></div>
     <div class="bibliography">${Object.entries(sources)
       .map(
         ([id, s], i) =>
@@ -735,6 +761,10 @@ paintIcons();
 // Read-only diagnostics make geometry/state regressions reproducible in browser tests.
 window.atlasDiagnostics = () => ({
   webgl: available,
+  species: species.id,
+  wingFactor: species.wing[state.sex],
+  ovariolesPerSide: species.ovarioles,
+  comparativeAnatomy: species.id !== "american",
   system: state.system,
   sex: state.sex,
   depth: state.depth,

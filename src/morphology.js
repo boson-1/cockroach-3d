@@ -50,34 +50,45 @@ function compoundEyeMaps() {
 
 // Original procedural surfaces. These are morphological reconstructions, not
 // segmented CT meshes. Their topology and visibility are independent of the UI.
-export function cuticleMaps(kind) {
+export function cuticleMaps(kind, species = {}, variation = 0) {
   if (typeof document === "undefined") return {};
   const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 2048;
+  const resolution = kind === "tergite" ? 0.5 : 1;
+  canvas.width = 1024 * resolution;
+  canvas.height = 2048 * resolution;
   const c = canvas.getContext("2d");
   const bump = document.createElement("canvas");
-  bump.width = 1024;
-  bump.height = 2048;
+  bump.width = canvas.width;
+  bump.height = canvas.height;
   const b = bump.getContext("2d");
+  c.scale(resolution, resolution);
+  b.scale(resolution, resolution);
   b.fillStyle = "#777";
   b.fillRect(0, 0, 1024, 2048);
   const gradient = c.createLinearGradient(0, 0, 700, 2048);
-  const colors =
+  let colors =
     kind === "pronotum"
-      ? ["#c39948", "#deb668", "#bd853d"]
+      ? species.pronotumColors || ["#c39948", "#deb668", "#bd853d"]
       : kind === "membrane"
         ? ["#b6a782", "#d2c6a5", "#a49168"]
-        : ["#4c1b16", "#67251a", "#884724"];
+        : species.wingColors || ["#4c1b16", "#67251a", "#884724"];
+  if (species.pattern === "banded" && kind === "wing")
+    colors =
+      species.textureSex === "male"
+        ? ["#b7984b", "#bb8d36", "#ad8539"]
+        : ["#5c2a1b", "#703a23", "#98683a"];
   colors.forEach((v, i) => gradient.addColorStop(i / 2, v));
   c.fillStyle = gradient;
   c.fillRect(0, 0, 1024, 2048);
-  let seed = 41;
+  let seed = 41 + variation * 3571;
   const random = () => {
     seed = (1664525 * seed + 1013904223) >>> 0;
     return seed / 4294967296;
   };
-  if (kind === "pronotum") {
+  if (
+    kind === "pronotum" &&
+    (!species.pattern || species.pattern === "american")
+  ) {
     // Pale peripheral field with two darker lobes connected across the front.
     // Asymmetry and diffuse boundaries reproduce one adult colour variant.
     c.save();
@@ -96,7 +107,7 @@ export function cuticleMaps(kind) {
     c.bezierCurveTo(118, 428, 48, 355, 95, 228);
     c.fill();
     c.restore();
-  } else {
+  } else if (kind === "wing" || kind === "membrane") {
     const vein = (points, width, opacity = 0.5) => {
       for (const ctx of [c, b]) {
         ctx.beginPath();
@@ -161,6 +172,151 @@ export function cuticleMaps(kind) {
           2.5,
           0.8,
         );
+    }
+  }
+  // Species markings are original irregular fields following the shell UVs.
+  if (kind === "pronotum" && species.pattern === "german") {
+    c.fillStyle = "#392a1c";
+    for (const x of [300, 650]) {
+      c.beginPath();
+      c.moveTo(x, 160);
+      c.bezierCurveTo(x - 45, 650, x - 65, 1410, x - 10, 1860);
+      c.lineTo(x + 105, 1860);
+      c.bezierCurveTo(x + 160, 1300, x + 150, 600, x + 95, 160);
+      c.closePath();
+      c.fill();
+    }
+  }
+  if (kind === "pronotum" && ["brown", "banded"].includes(species.pattern)) {
+    c.fillStyle = species.pattern === "brown" ? "#55271c" : "#63311c";
+    c.shadowColor = species.pattern === "brown" ? "#8b5d39" : "#855231";
+    c.shadowBlur = species.pattern === "brown" ? 60 : 15;
+    c.beginPath();
+    c.ellipse(510, 1090, 390, 770, 0, 0, Math.PI * 2);
+    c.fill();
+    c.shadowBlur = 0;
+    if (species.pattern === "brown") {
+      c.fillStyle = "#95622f";
+      c.globalAlpha = 0.65;
+      // Diffuse paired amber fields can form an anchor-like pronotal variant.
+      for (const s of [-1, 1]) {
+        c.beginPath();
+        c.ellipse(512 + s * 170, 1100, 105, 470, s * 0.16, 0, Math.PI * 2);
+        c.fill();
+      }
+      c.globalAlpha = 1;
+    }
+  }
+  if (kind === "wing" && species.pattern === "banded") {
+    // Adults have sex-specific fields. Do not paste the nymph's two broad,
+    // high-contrast thoracic bands onto both adult wing surfaces.
+    if (species.textureSex === "male") {
+      c.fillStyle = "rgba(106,47,22,.88)";
+      c.beginPath();
+      c.moveTo(0, 260);
+      c.bezierCurveTo(360, 190, 720, 330, 1024, 280);
+      c.lineTo(1024, 620);
+      c.bezierCurveTo(680, 710, 300, 585, 0, 700);
+      c.closePath();
+      c.fill();
+      c.fillStyle = "rgba(225,202,134,.24)";
+      c.fillRect(0, 735, 1024, 155);
+    } else {
+      for (const y of [310, 1000]) {
+        c.fillStyle = "rgba(216,192,131,.67)";
+        c.beginPath();
+        c.moveTo(680, y);
+        c.bezierCurveTo(810, y - 65, 930, y - 15, 1024, y - 25);
+        c.lineTo(1024, y + 120);
+        c.bezierCurveTo(900, y + 110, 755, y + 60, 680, y + 45);
+        c.closePath();
+        c.fill();
+      }
+      c.strokeStyle = "rgba(202,168,101,.3)";
+      c.lineWidth = 35;
+      c.beginPath();
+      c.moveTo(0, 330);
+      c.bezierCurveTo(320, 210, 590, 315, 1024, 310);
+      c.stroke();
+    }
+  }
+  if (species.pattern === "australian") {
+    if (kind === "pronotum") {
+      c.fillStyle = "#241b14";
+      c.beginPath();
+      c.moveTo(135, 260);
+      c.bezierCurveTo(210, 120, 420, 130, 512, 185);
+      c.bezierCurveTo(660, 95, 820, 130, 900, 260);
+      c.bezierCurveTo(945, 730, 925, 1470, 880, 1860);
+      c.bezierCurveTo(700, 1980, 330, 1980, 135, 1860);
+      c.bezierCurveTo(95, 1400, 80, 740, 135, 260);
+      c.fill();
+    } else if (kind === "wing") {
+      // u=1 is the costal margin; image y=0 is the wing attachment.
+      // Restrict the stripe to the outer basal third, leaving the apex brown.
+      const yellow = c.createLinearGradient(0, 0, 0, 840);
+      yellow.addColorStop(0, "#d4ae59");
+      yellow.addColorStop(0.7, "#c6a04b");
+      yellow.addColorStop(1, "#987137");
+      c.fillStyle = yellow;
+      c.beginPath();
+      c.moveTo(805, 0);
+      c.lineTo(1024, 0);
+      c.lineTo(1024, 785);
+      c.bezierCurveTo(945, 720, 921, 380, 805, 0);
+      c.fill();
+    }
+  }
+  if (species.pattern === "harlequin" && kind !== "membrane") {
+    c.fillStyle = "#191915";
+    c.fillRect(0, 0, 1024, 2048);
+    const blob = (x, y, rx, ry) => {
+      c.beginPath();
+      for (let k = 0; k <= 36; k++) {
+        const a = (k / 36) * Math.PI * 2,
+          r = 1 + 0.15 * Math.sin(a * 3 + variation) + 0.07 * Math.cos(a * 7);
+        const xx = x + Math.cos(a) * rx * r,
+          yy = y + Math.sin(a) * ry * r;
+        k ? c.lineTo(xx, yy) : c.moveTo(xx, yy);
+      }
+      c.closePath();
+      c.fill();
+    };
+    c.fillStyle = "#cbb888";
+    if (kind === "pronotum") {
+      c.strokeStyle = "#cbb888";
+      c.lineWidth = 68;
+      c.lineCap = "round";
+      c.lineJoin = "round";
+      c.beginPath();
+      c.moveTo(83, 1850);
+      c.bezierCurveTo(70, 1320, 65, 700, 105, 350);
+      c.bezierCurveTo(185, 70, 285, 110, 370, 305);
+      c.lineTo(512, 175);
+      c.lineTo(655, 305);
+      c.bezierCurveTo(760, 110, 845, 70, 920, 350);
+      c.bezierCurveTo(960, 700, 950, 1330, 940, 1850);
+      c.stroke();
+      for (const x of [335, 690]) {
+        blob(x, 770, 78, 150);
+        blob(x, 1440, 90, 220);
+      }
+    } else if (kind === "tergite") {
+      // Each texture covers one half-tergite: u=0 is the midline. Most
+      // abdominal cuticle remains dark, with paired irregular lateral marks.
+      blob(935, 520, variation >= 10 ? 190 : 125, 420);
+      blob(820, 1330, variation >= 10 ? 145 : 72, 250);
+      if (variation >= 10) blob(360, 780, 95, 370);
+      else if (variation % 3 === 0) {
+        c.beginPath();
+        c.moveTo(40, 180);
+        c.bezierCurveTo(280, 120, 490, 225, 670, 155);
+        c.lineTo(650, 265);
+        c.bezierCurveTo(430, 325, 260, 220, 40, 260);
+        c.fill();
+      }
+    } else {
+      blob(960, 800, 95, 640);
     }
   }
   // Micropunctures and low-amplitude microrelief avoid the smooth plastic look.
@@ -252,10 +408,10 @@ function profile(t, points) {
 }
 
 export function buildExternal(ctx) {
-  const { register, mesh, ell, tube, line } = ctx;
-  const shell = cuticle("#773821"),
+  const { register, mesh, ell, tube, line, species = {} } = ctx;
+  const shell = cuticle(species.shell || "#773821"),
     joint = "#3e2118";
-  const segment = (parent, a, b, r1, r2, color = "#854322") => {
+  const segment = (parent, a, b, r1, r2, color = species.leg || "#854322") => {
     const av = V(...a),
       bv = V(...b),
       d = bv.clone().sub(av);
@@ -301,7 +457,13 @@ export function buildExternal(ctx) {
         24,
         12,
       ),
-      cuticle(i % 2 ? "#8a4828" : "#74341e"),
+      cuticle(
+        species.id === "american"
+          ? i % 2
+            ? "#8a4828"
+            : "#74341e"
+          : species.leg || "#74341e",
+      ),
     );
   }
   // Continuous pleural cuticle closes the body laterally; it does not expose
@@ -329,7 +491,9 @@ export function buildExternal(ctx) {
         12,
         80,
       ),
-      cuticle("#764021", { roughness: 0.39 }),
+      cuticle(species.id === "american" ? "#764021" : species.shell, {
+        roughness: 0.39,
+      }),
     );
   const thoracic = register(49);
   for (let i = 0; i < 3; i++) {
@@ -388,10 +552,38 @@ export function buildExternal(ctx) {
       const p = paths[leg].map((a) => [a[0] * side, a[1], a[2]]);
       const socket = ell(legs, ...p[0], 0.2, 0.23, 0.15, joint);
       socket.material.roughness = 0.35;
-      segment(coxa, p[0], p[1], 0.21, 0.16, "#995124");
-      segment(trochanter, p[1], p[2], 0.12, 0.1, "#7a351c");
-      segment(femur, p[2], p[3], 0.135, 0.083, "#91431e");
-      segment(tibia, p[3], p[4], 0.067, 0.032, "#8e3f1d");
+      segment(
+        coxa,
+        p[0],
+        p[1],
+        0.21,
+        0.16,
+        species.id === "american" ? "#995124" : species.leg,
+      );
+      segment(
+        trochanter,
+        p[1],
+        p[2],
+        0.12,
+        0.1,
+        species.id === "american" ? "#7a351c" : species.shell,
+      );
+      segment(
+        femur,
+        p[2],
+        p[3],
+        0.135,
+        0.083,
+        species.id === "american" ? "#91431e" : species.leg,
+      );
+      segment(
+        tibia,
+        p[3],
+        p[4],
+        0.067,
+        0.032,
+        species.id === "american" ? "#8e3f1d" : species.leg,
+      );
       for (let j = 1; j < 5; j++)
         ell(legs, ...p[j], j === 3 ? 0.095 : 0.072, 0.075, 0.065, joint);
       const a = V(...p[4]),
@@ -495,7 +687,9 @@ export function buildExternal(ctx) {
     }
   const head = register(38);
   const headMesh = ell(head, 0, 2.47, 0.39, 0.43, 0.53, 0.32, "#79321b");
-  headMesh.material = cuticle("#79321b");
+  headMesh.material = cuticle(
+    species.id === "american" ? "#79321b" : species.shell,
+  );
   const hp = headMesh.geometry.attributes.position;
   for (let i = 0; i < hp.count; i++)
     hp.setX(i, hp.getX(i) * (0.82 + 0.18 * hp.getY(i)));
@@ -637,14 +831,22 @@ export function buildExternal(ctx) {
         segment(palps, path[i], path[i + 1], 0.032, 0.025, "#ac8551");
   }
   const cerci = register(24);
+  const cercusLength = species.cerci || 1;
   for (const s of [-1, 1]) {
     for (let i = 0; i < 17; i++) {
       const t = i / 17,
-        r = 0.072 * (1 - t * 0.87),
-        a = [s * (0.38 + t * 0.43), -2.87 - t * 0.75, 0.22 - t * 0.11],
+        r =
+          0.072 *
+          (["brown", "australian"].includes(species.pattern) ? 1.18 : 1) *
+          (1 - t * 0.87),
+        a = [
+          s * (0.38 + t * 0.43 * cercusLength),
+          -2.87 - t * 0.75 * cercusLength,
+          0.22 - t * 0.11,
+        ],
         b = [
-          s * (0.38 + (t + 1 / 17) * 0.43),
-          -2.87 - (t + 0.052) * 0.75,
+          s * (0.38 + (t + 1 / 17) * 0.43 * cercusLength),
+          -2.87 - (t + 0.052) * 0.75 * cercusLength,
           0.22 - (t + 0.052) * 0.11,
         ];
       segment(cerci, a, b, r, r * 0.91, "#684020");
@@ -681,11 +883,21 @@ export function buildExternal(ctx) {
 }
 
 export function buildCovers(ctx) {
-  const { register, mesh, root, flaps } = ctx;
+  const { register, mesh, root, flaps, species = {} } = ctx;
   const maps = {
-    wing: cuticleMaps("wing"),
+    wing: cuticleMaps("wing", species),
     membrane: cuticleMaps("membrane"),
-    pronotum: cuticleMaps("pronotum"),
+    pronotum: cuticleMaps("pronotum", species),
+  };
+  const maleWingMap =
+    species.pattern === "banded"
+      ? cuticleMaps("wing", { ...species, textureSex: "male" }).map
+      : null;
+  const tergiteMaps = new Map();
+  const patternMaps = (index) => {
+    if (!tergiteMaps.has(index))
+      tergiteMaps.set(index, cuticleMaps("tergite", species, index));
+    return tergiteMaps.get(index);
   };
   const createFlap = (id, index, side, z) => {
     const hinge = new THREE.Group();
@@ -693,7 +905,15 @@ export function buildCovers(ctx) {
     root.add(hinge);
     const group = register(id, hinge);
     group.position.set(-side * 1.11, 0, -z);
-    flaps.push({ hinge, group, index, side, id, open: 0 });
+    flaps.push({
+      hinge,
+      group,
+      index,
+      side,
+      id,
+      open: 0,
+      previewDepth: species.reducedWings && id === 3 ? 1 : index,
+    });
     return group;
   };
   for (const side of [-1, 1]) {
@@ -723,8 +943,44 @@ export function buildCovers(ctx) {
           18,
           10,
         ),
-        cuticle(i % 2 ? "#77351e" : "#854324"),
+        species.pattern === "harlequin"
+          ? cuticle("#ffffff", { ...patternMaps(i), bumpScale: 0.004 })
+          : cuticle(species.shell || (i % 2 ? "#77351e" : "#854324")),
       );
+    }
+    // Directly researched species-specific gland regions remain attached to
+    // their tergites when the demonstration flaps turn.
+    if (species.id === "brown-banded" || species.id === "german") {
+      const id = species.id === "brown-banded" ? 65 : 66;
+      const gland = register(id, wall);
+      for (const i of id === 65 ? [3, 4] : [6, 7]) {
+        const y = 0.69 - i * 0.365;
+        mesh(
+          gland,
+          surface(
+            (u, v) => {
+              const x = id === 65 ? 0.82 + u * 0.16 : 0.12 + u * 0.29;
+              return [
+                side * x,
+                y - 0.055 - v * 0.2,
+                0.42 +
+                  0.44 * Math.cos((x * Math.PI) / 2) +
+                  0.047 +
+                  (id === 66
+                    ? -0.016 * Math.sin(u * Math.PI) * Math.sin(v * Math.PI)
+                    : 0),
+              ];
+            },
+            0.007,
+            16,
+            14,
+          ),
+          cuticle(id === 65 ? "#8b6f41" : "#634525", {
+            roughness: 0.49,
+            clearcoat: 0.25,
+          }),
+        );
+      }
     }
     // A small piece of body wall belongs to index 03, so the overall shell is
     // selectable independently of its more detailed tergite entry.
@@ -736,7 +992,7 @@ export function buildCovers(ctx) {
         6,
         24,
       ),
-      cuticle("#6b321f"),
+      cuticle(species.id === "american" ? "#6b321f" : species.shell),
     );
     for (let i = 0; i < 2; i++)
       mesh(
@@ -753,8 +1009,28 @@ export function buildCovers(ctx) {
           18,
           14,
         ),
-        cuticle("#70331e"),
+        species.pattern === "harlequin"
+          ? cuticle("#ffffff", { ...patternMaps(10), bumpScale: 0.004 })
+          : cuticle(species.shell || "#70331e"),
       );
+    if (species.reducedWings) {
+      const remnant = createFlap(1, 0, side, 0.82);
+      mesh(
+        remnant,
+        surface(
+          (u, t) => [
+            side * (0.69 + u * 0.33 * Math.pow(Math.sin(t * Math.PI), 0.6)),
+            1.68 - t * 0.72,
+            0.94 - u * 0.14,
+          ],
+          0.025,
+          18,
+          22,
+        ),
+        cuticle("#ffffff", { ...maps.wing, bumpScale: 0.004 }),
+      );
+      continue;
+    }
     const hind = createFlap(2, 1, side, 0.72);
     mesh(
       hind,
@@ -828,9 +1104,12 @@ export function buildCovers(ctx) {
       ),
       cuticle("#ffffff", {
         ...maps.wing,
+        userData: maleWingMap
+          ? { sexMaps: { female: maps.wing.map, male: maleWingMap } }
+          : {},
         bumpScale: 0.009,
-        roughness: 0.3,
-        clearcoat: 0.72,
+        roughness: species.id === "american" ? 0.3 : 0.42,
+        clearcoat: species.id === "american" ? 0.72 : 0.43,
         clearcoatRoughness: 0.23,
       }),
     );
@@ -864,8 +1143,8 @@ export function buildCovers(ctx) {
     cuticle("#ffffff", {
       ...maps.pronotum,
       bumpScale: 0.004,
-      roughness: 0.26,
-      clearcoat: 0.8,
+      roughness: species.id === "american" ? 0.26 : 0.4,
+      clearcoat: species.id === "american" ? 0.8 : 0.45,
     }),
   );
 }

@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { buildExternal, buildCovers, cuticle, surface } from "./morphology.js";
-import { organs, systems } from "./data.js";
+import { systems } from "./data.js";
+import { speciesList } from "./species.js";
+import { createAtlasData } from "./atlas-data.js";
 
 const C = {
   ink: "#623d2b",
@@ -26,7 +28,8 @@ const flat = (color, extra = {}) =>
     ...extra,
   });
 
-export function createSpecimen() {
+export function createSpecimen(species = speciesList[0]) {
+  const { organs } = createAtlasData(species);
   const root = new THREE.Group(),
     parts = new Map(),
     flaps = [],
@@ -80,7 +83,7 @@ export function createSpecimen() {
     parent.add(l);
     return l;
   }
-  const exterior = buildExternal({ register, mesh, ell, tube, line });
+  const exterior = buildExternal({ register, mesh, ell, tube, line, species });
   const hemi = register(30);
   const h = ell(hemi, 0, -0.45, 0.21, 0.92, 2.13, 0.075, "#e0c999");
   h.material.transparent = true;
@@ -495,8 +498,8 @@ export function createSpecimen() {
     ovarioles = register(59, femaleGroup),
     oviduct = register(16, femaleGroup);
   for (const side of [-1, 1]) {
-    for (let i = 0; i < 8; i++) {
-      const x = side * (0.35 + i * 0.06),
+    for (let i = 0; i < (species.ovarioles || 8); i++) {
+      const x = side * (0.35 + i * (0.42 / ((species.ovarioles || 8) - 1))),
         y = -1.12 - (i % 3) * 0.075,
         z = 0.45 + (i % 2) * 0.055;
       tube(
@@ -743,7 +746,7 @@ export function createSpecimen() {
     ),
     cuticle("#754023"),
   );
-  buildCovers({ register, mesh, root, flaps });
+  buildCovers({ register, mesh, root, flaps, species });
 
   // Merge repeated follicles, branches, bristles and eye facets per organ and
   // material. Each organ remains selectable while avoiding hundreds of draws.
@@ -853,8 +856,16 @@ export function createSpecimen() {
       }
     }
   });
+  const wingMeshes = pickables.filter((o) =>
+    [1, 2].includes(o.userData.organId),
+  );
+  for (const o of wingMeshes)
+    o.userData.restPositions = o.geometry.attributes.position.array.slice();
+  let renderedSex = null;
   const anchors = {
-    1: [0.62, -0.5, 1.17],
+    1: species.reducedWings ? [0.92, 1.28, 0.91] : [0.62, -0.5, 1.17],
+    65: [0.91, -0.57, 0.61],
+    66: [0.27, -1.76, 0.89],
     2: [-0.55, -1, 1.06],
     3: [0.75, -1.9, 0.97],
     4: [0.68, -0.58, 0.49],
@@ -877,7 +888,7 @@ export function createSpecimen() {
     21: [-0.51, 2.15, 0.46],
     22: [-0.38, 2.17, 1.12],
     23: [2.09, 0.22, 0.2],
-    24: [-0.64, -3.28, 0.25],
+    24: [-0.38 - 0.26 * species.cerci, -2.87 - 0.41 * species.cerci, 0.25],
     25: [1.08, -0.65, 0.34],
     26: [0.03, -1.04, 0.76],
     27: [-0.29, -0.84, 0.67],
@@ -935,20 +946,56 @@ export function createSpecimen() {
       const desired =
         state.depth > f.index
           ? 1
-          : state.preview === f && state.depth >= f.index
+          : state.preview === f && state.depth >= f.previewDepth
             ? 0.72
             : 0;
       f.open = THREE.MathUtils.lerp(f.open, desired, smoothing);
       f.hinge.rotation.y = f.side * f.open * [2.65, 2.38, 2.12][f.index];
     }
+    syncEnclosedAnatomy();
     for (let i = 0; i < animated.length; i++)
       animated[i].scale.x =
         0.09 * (state.reduced ? 1 : 1 + Math.sin(time * 2.8 - i * 0.35) * 0.04);
+  }
+  function syncEnclosedAnatomy() {
+    // Internal reference meshes are enclosed by the intact cuticle. Suppress
+    // them until dissection so approximate organ routes cannot poke through
+    // short-winged species or mimic pale markings on their exposed tergites.
+    const exposed =
+      state.depth === 3 ||
+      state.focus !== "external" ||
+      flaps.some((f) => f.index === 2 && f.open > 0.08);
+    root.traverse((o) => {
+      if (!o.isMesh && !o.isLine) return;
+      const id = o.userData.organId || o.parent?.userData.organId;
+      const entry = organs.find((p) => p.id === id);
+      const internal =
+        entry &&
+        ((entry.system !== "external" &&
+          ![17, 18, 19, 24, 25, 40, 51, 53, 65, 66].includes(id)) ||
+          [31, 55, 60].includes(id));
+      o.visible = (o.userData.wantedVisible ?? true) && (!internal || exposed);
+    });
   }
   function style(system, selected, sex) {
     state.focus = system;
     state.selected = selected;
     state.sex = sex;
+    root.scale.x = species.width[sex];
+    if (renderedSex !== sex) {
+      for (const o of wingMeshes) {
+        if (species.reducedWings) continue;
+        const p = o.geometry.attributes.position,
+          rest = o.userData.restPositions;
+        const origin = o.userData.organId === 1 ? 1.94 : 1.25;
+        for (let i = 0; i < p.count; i++)
+          p.setY(i, origin + (rest[i * 3 + 1] - origin) * species.wing[sex]);
+        p.needsUpdate = true;
+        o.geometry.computeVertexNormals();
+        o.geometry.computeBoundingSphere();
+      }
+      renderedSex = sex;
+    }
     femaleGroup.visible = sex === "female";
     maleGroup.visible = sex === "male";
     const focusIds = organs.filter((o) => o.system === system).map((o) => o.id);
@@ -976,7 +1023,11 @@ export function createSpecimen() {
         return false;
       });
       const internal = system !== "external";
-      o.visible = !state.isolated || family.includes(id);
+      const entrySex = organs.find((entry) => entry.id === id)?.sex;
+      o.visible =
+        (!entrySex || entrySex === sex) &&
+        (!state.isolated || family.includes(id));
+      o.userData.wantedVisible = o.visible;
       const opacity =
         internal && !focusIds.includes(id) && !isFlap
           ? id === 3 || id === 22
@@ -1000,7 +1051,10 @@ export function createSpecimen() {
         m.depthWrite = localOpacity > 0.5 && m.userData.baseOpacity > 0.5;
         const entry = organs.find((o) => o.id === id),
           color = systems.find((s) => s.id === entry?.system)?.color;
-        const nextMap = state.palette === "system" ? null : m.userData.baseMap;
+        const nextMap =
+          state.palette === "system"
+            ? null
+            : m.userData.sexMaps?.[sex] || m.userData.baseMap;
         if (m.map !== nextMap) {
           m.map = nextMap;
           m.needsUpdate = true;
@@ -1011,6 +1065,14 @@ export function createSpecimen() {
               ? new THREE.Color(color)
               : m.userData.originalColor,
           );
+        if (
+          m.color &&
+          species.id === "brown-banded" &&
+          sex === "female" &&
+          state.palette === "natural" &&
+          [1, 3, 22, 48, 49, 50].includes(id)
+        )
+          m.color.multiplyScalar(0.82);
         if (m.emissive) {
           m.emissive.set(id === selected ? "#b2a997" : "#000000");
           m.emissiveIntensity = id === selected ? 0.025 : 0;
@@ -1023,17 +1085,23 @@ export function createSpecimen() {
       while (p && !p.userData.organId) p = p.parent;
       const id = p?.userData.organId;
       o.visible = !state.isolated || family.includes(id);
+      o.userData.wantedVisible = o.visible;
       o.material.opacity =
         system !== "external" && !focusIds.includes(id) ? 0.07 : 0.45;
     });
+    syncEnclosedAnatomy();
   }
 
   function getAnchor(id) {
     const pos = V(...anchors[id]);
-    if ([1, 2, 3, 48, 49].includes(id)) {
+    if ([1, 2].includes(id) && !species.reducedWings) {
+      const origin = id === 1 ? 1.94 : 1.25;
+      pos.y = origin + (pos.y - origin) * species.wing[state.sex];
+    }
+    if ([1, 2, 3, 48, 49, 65, 66].includes(id)) {
       const f = flaps.find(
         (f) =>
-          f.id === ([48, 49].includes(id) ? 3 : id) &&
+          f.id === ([48, 49, 65, 66].includes(id) ? 3 : id) &&
           f.side === (id === 2 ? -1 : 1),
       );
       if (f) {
@@ -1060,6 +1128,7 @@ export function createSpecimen() {
   }
   return {
     root,
+    species,
     parts,
     flaps,
     state,
@@ -1096,7 +1165,9 @@ export function createSpecimen() {
           : getAnchor(id);
       return {
         center,
-        radius: broad[id] || ([45, 46, 47, 57, 58].includes(id) ? 0.42 : 0.67),
+        radius:
+          (species.reducedWings && id === 1 ? 0.6 : broad[id]) ||
+          ([45, 46, 47, 57, 58].includes(id) ? 0.42 : 0.67),
       };
     },
   };

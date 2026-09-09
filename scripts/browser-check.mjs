@@ -4,6 +4,8 @@ import { readFile } from "node:fs/promises";
 import { resolve, extname } from "node:path";
 import assert from "node:assert/strict";
 import { organs, systems, sources } from "../src/data.js";
+import { speciesList } from "../src/species.js";
+import { createAtlasData } from "../src/atlas-data.js";
 
 // Test the production build at a project subpath, exactly as Pages serves it.
 const dist = resolve("dist");
@@ -190,6 +192,123 @@ try {
   );
   console.log("PASS responsive layout at 390px and 320px");
   await page.close(); // Release the first WebGL context before mobile shader warmup.
+  for (const species of speciesList.slice(1)) {
+    const p = await browser.newPage({
+      viewport: { width: 1440, height: 1080 },
+      reducedMotion: "reduce",
+    });
+    p.on("pageerror", (e) => errors.push(e.message));
+    p.on("response", (r) => {
+      if (r.url().startsWith(url) && r.status() >= 400)
+        failedAssets.push(r.url());
+    });
+    const atlas = createAtlasData(species);
+    await p.goto(url + species.page, { waitUntil: "domcontentloaded" });
+    await p.waitForFunction(() => window.atlasDiagnostics?.().webgl);
+    let d = await p.evaluate(() => atlasDiagnostics());
+    assert.equal(d.species, species.id);
+    assert.equal(d.organs, atlas.organs.length);
+    assert.equal(
+      await p.locator('.species-link[aria-current="page"]').count(),
+      1,
+    );
+    assert.equal(await p.locator(".species-link").count(), speciesList.length);
+    for (const system of systems) {
+      await p.locator('[data-system="' + system.id + '"]').click();
+      for (const o of atlas.organs.filter((o) => o.system === system.id)) {
+        if (o.sex) await p.locator('[data-sex="' + o.sex + '"]').click();
+        await p.locator('.organ-row[data-organ="' + o.id + '"]').click();
+        const d = await p.evaluate(() => atlasDiagnostics());
+        assert.equal(d.selected, o.id);
+        assert.ok(d.pickableIds.includes(o.id), species.id + ":" + o.id);
+      }
+    }
+    if (species.id === "brown-banded") {
+      await p.locator('[data-sex="female"]').click();
+      assert.equal(
+        (await p.evaluate(() => atlasDiagnostics())).wingFactor,
+        0.7,
+      );
+      await p.locator('.organ-row[data-organ="65"]').click();
+      await p.locator("#inspect-part").click();
+      assert.deepEqual(
+        (await p.evaluate(() => atlasDiagnostics())).pickableIds,
+        [65],
+      );
+      await p.locator("#inspect-part").click();
+      await p.locator('[data-sex="male"]').click();
+      assert.equal(
+        (await p.evaluate(() => atlasDiagnostics())).wingFactor,
+        1.02,
+      );
+    }
+    await p.locator("#reset-view").click();
+    if (species.id === "brown-banded") {
+      await p.locator('[data-view="top"]').click();
+      await p.locator('[data-sex="male"]').click();
+      await p.mouse.move(0, 0);
+      const before = await p.locator("#stage").screenshot();
+      await p.locator('[data-palette="system"]').click();
+      await p.locator('[data-sex="female"]').click();
+      await p.locator('[data-palette="natural"]').click();
+      await p.locator('[data-sex="male"]').click();
+      await p.mouse.move(0, 0);
+      assert.ok(
+        before.equals(await p.locator("#stage").screenshot()),
+        "sex-specific wing texture survives palette and sex round trip",
+      );
+    }
+    if (species.reducedWings) {
+      assert.equal(await p.locator('[data-depth="2"]').count(), 0);
+      assert.ok(
+        !(await p.evaluate(() => atlasDiagnostics())).pickableIds.includes(2),
+      );
+      await p.locator("#specimen-canvas").focus();
+      for (const [key, depth] of [
+        ["ArrowRight", 1],
+        ["ArrowRight", 3],
+        ["ArrowLeft", 1],
+        ["ArrowLeft", 0],
+      ]) {
+        await p.keyboard.press(key);
+        assert.equal((await p.evaluate(() => atlasDiagnostics())).depth, depth);
+      }
+    }
+    await p.locator('[data-system="digestive"]').click();
+    await p.locator('.organ-row[data-organ="13"]').click();
+    assert.match(await p.locator(".evidence-badge").textContent(), /比較解剖/);
+    await p.locator(".reference-detail summary").click();
+    assert.match(
+      await p.locator(".reference-detail").textContent(),
+      /美洲蟑螂/,
+    );
+    await p.locator("#sources-open").click();
+    assert.equal(
+      await p.locator(".bibliography article").count(),
+      Object.keys(atlas.sources).length,
+    );
+    await p.keyboard.press("Escape");
+    await p.locator(".species-comparison summary").click();
+    assert.equal(
+      await p.locator(".species-comparison tbody tr").count(),
+      speciesList.length,
+    );
+    for (const width of [390, 320]) {
+      await p.setViewportSize({ width, height: 844 });
+      assert.ok(
+        await p.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+        species.id + " overflow " + width,
+      );
+    }
+    console.log(
+      "PASS " +
+        species.id +
+        ": all organ entries, variants, citations, routes and mobile layout",
+    );
+    await p.close();
+  }
   const touch = await browser.newPage({
     viewport: { width: 390, height: 844 },
     hasTouch: true,
