@@ -80,7 +80,9 @@ pnpm build
 pnpm test:browser
 ```
 
-在 Linux CI 使用 `pnpm exec playwright install --with-deps chromium`。測試包含實際滑鼠射線掀頁、移出復原、點按固定、六種標本的全部部位、雌雄形態與腺區互斥、鍵盤、視角、標註、文獻對話框、320／390px 排版、觸控、WebGL 失敗降級及 GitHub Pages 子路徑。診斷介面 `window.atlasDiagnostics()` 只讀取狀態，不修改資料。
+在 Linux CI 使用 `pnpm exec playwright install --with-deps chromium`。六個物種各由獨立 runner 同時測試，全部通過才允許部署。設定環境變數 `ATLAS_SPECIES` 可單獨檢查 `american`、`german`、`brown`、`brown-banded`、`harlequin` 或 `australian`；不設定時執行完整圖鑑測試。每個物種的 CI 檢查也涵蓋觸控與 WebGL 失敗降級。
+
+測試包含實際滑鼠射線掀頁、移出復原、點按固定、六種標本的全部部位、雌雄形態與腺區互斥、鍵盤、視角、標註、文獻對話框、320／390px 排版、觸控、WebGL 失敗降級及 GitHub Pages 子路徑。診斷介面 `window.atlasDiagnostics()` 只讀取狀態，不修改資料。
 
 ## 結構
 
