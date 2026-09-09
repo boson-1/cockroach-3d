@@ -13,6 +13,9 @@ const selectedSpecies = speciesList.filter(
   (species) => !requestedSpecies || species.id === requestedSpecies,
 );
 assert.ok(selectedSpecies.length, `Unknown ATLAS_SPECIES: ${requestedSpecies}`);
+// Hosted runners use SwiftShader. Keep CSS layout/raycast coordinates unchanged
+// while reducing the offscreen raster workload for interaction tests.
+const deviceScaleFactor = process.env.CI ? 0.5 : 1;
 
 // Test the production build at a project subpath, exactly as Pages serves it.
 const dist = resolve("dist");
@@ -73,6 +76,7 @@ try {
     console.log("START american: full interaction suite");
     const page = await browser.newPage({
       viewport: { width: 1440, height: 1050 },
+      deviceScaleFactor,
     });
     page.on("pageerror", (e) => errors.push(e.message));
     page.on("response", (r) => {
@@ -206,6 +210,7 @@ try {
     console.log("START " + species.id + ": full interaction suite");
     const p = await browser.newPage({
       viewport: { width: 1440, height: 1080 },
+      deviceScaleFactor,
       reducedMotion: "reduce",
     });
     p.on("pageerror", (e) => errors.push(e.message));
@@ -258,14 +263,14 @@ try {
       await p.locator('[data-view="top"]').click();
       await p.locator('[data-sex="male"]').click();
       await p.mouse.move(0, 0);
-      const before = await p.locator("#stage").screenshot();
+      const before = await p.locator("#stage").screenshot({ timeout: 120000 });
       await p.locator('[data-palette="system"]').click();
       await p.locator('[data-sex="female"]').click();
       await p.locator('[data-palette="natural"]').click();
       await p.locator('[data-sex="male"]').click();
       await p.mouse.move(0, 0);
       assert.ok(
-        before.equals(await p.locator("#stage").screenshot()),
+        before.equals(await p.locator("#stage").screenshot({ timeout: 120000 })),
         "sex-specific wing texture survives palette and sex round trip",
       );
     }
@@ -322,6 +327,7 @@ try {
   }
   const touch = await browser.newPage({
     viewport: { width: 390, height: 844 },
+    deviceScaleFactor,
     hasTouch: true,
     isMobile: true,
   });
