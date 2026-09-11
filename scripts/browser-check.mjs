@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { organs, systems, sources } from "../src/data.js";
 import { speciesList } from "../src/species.js";
 import { createAtlasData } from "../src/atlas-data.js";
+import { pageMetadata } from "../src/seo.js";
 
 // CI gives each species its own runner; the default still checks the entire atlas.
 const requestedSpecies = process.env.ATLAS_SPECIES;
@@ -85,6 +86,8 @@ try {
     });
     await page.goto(url, { waitUntil: "domcontentloaded" });
     await page.waitForFunction(() => window.atlasDiagnostics?.().webgl === true);
+    assert.equal(await page.title(), pageMetadata(speciesList[0]).title);
+    assert.equal(await page.locator(".anatomy-entry").count(), organs.length);
     assert.equal(
       (await page.evaluate(() => window.atlasDiagnostics())).organs,
       organs.length,

@@ -58,6 +58,8 @@ jobs:
           name: website-build
           path: dist
       - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:seo
+        if: matrix.species == 'american'
       - run: pnpm test:browser
         env:
           ATLAS_SPECIES: ${{ matrix.species }}

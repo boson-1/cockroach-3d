@@ -32,6 +32,7 @@ pnpm dev
 ```sh
 pnpm test            # 器官、性別、翻片層次與來源對應測試
 pnpm build           # 產生 dist/ 靜態網站
+pnpm test:seo        # 不執行 JavaScript 的正文、搜尋標記與手機閱讀檢查
 pnpm preview         # 預覽正式版本
 ```
 
@@ -72,6 +73,8 @@ DNS 目標不含 `https://`、路徑或 repo 名稱。DNS 生效後，GitHub 會
 
 ## Google Search Console
 
+2026-09-11 起，六頁的物種筆記、器官文字圖鑑與引用均在 Vite 建置階段產生，原始 HTML 就能閱讀；JavaScript 為頁面加上 3D 操作。每頁具有獨立搜尋標題／摘要、社群文字摘要及與正文相符的 JSON-LD。維護說明、搜尋意圖和官方指引見 [SEO.md](SEO.md)。
+
 本站使用已驗證的 [HTTPS 網址資源](https://search.google.com/search-console?resource_id=https%3A%2F%2Fmaxxc.jamesboson.com%2F)，透過既有的網域名稱供應商驗證自動確認擁有權；請保留原有 Google 網域驗證 DNS 紀錄。
 
 `public/sitemap.xml` 列出六個物種的正式 HTTPS 網址，`public/robots.txt` 提供 Sitemap 位置。六個 HTML 頁面各有 canonical 標記，美洲頁面的標準網址為根目錄 `/`。新增或更改物種路徑時，同步維護 Sitemap 與 canonical；`public/` 的檔案由 Vite 複製至正式網站根目錄。
@@ -104,6 +107,9 @@ pnpm test:browser
 | `src/morphology.js`         | 曲面殼體、頭胸腹、分節足與觸角、翅面／背板微表面紋理 |
 | `src/anatomy-detail.js`     | 新增的 27 個解剖部位及物種形態研究來源               |
 | `src/main.js`               | 介面、滑鼠與觸控互動、鏡頭、標註避讓、科學筆記       |
+| `src/page-template.js`      | 建置時產生物種頁面，保留既有互動介面與完整文字閱讀 |
+| `src/seo.js`                | 獨立搜尋標記、結構化資料、器官文字圖鑑與內容日期 |
+| `scripts/seo-check.mjs`     | 正式 HTML、不執行 JavaScript、搜尋標記與站內連結檢查 |
 | `src/style.css`             | 版面、紙本圖鑑視覺、響應式配置                       |
 | `tests/anatomy.test.js`     | 資料與模型的整合檢查                                 |
 | `scripts/browser-check.mjs` | 正式建置的瀏覽器操作測試                             |
